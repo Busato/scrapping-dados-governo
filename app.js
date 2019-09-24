@@ -1,22 +1,70 @@
-var Crawler = require("crawler")
+const crawlerController = require("./crawler.js")
+const Noticia = require('./noticia.js')
+
+const crawler = crawlerController.createCrawler()
+
+crawler.queue([{
+    uri: 'https://noticias.uol.com.br/',
  
-var c = new Crawler({
-    maxConnections : 10,
-    // This will be called for each crawled page
-    callback : function (error, res, done) {
+    callback: function (error, res, done) {
         if (error) {
             console.log(error)
         } else {
             var $ = res.$
-            console.log(res)
-            // $ is Cheerio by default
-            // a lean implementation of core jQuery designed specifically for the server
-            console.log($("title").text())
+            $('.highlights-headline .row').each((i, element) => {
+                const cheerioElement = $(element)
+
+                const thumbImage = cheerioElement.find('.thumb-image')
+                const thumbTitle = cheerioElement.find('.thumb-title')
+                const text = thumbTitle.text()
+                console.log(text)
+
+                // let currentNews = new Noticia(text, )
+
+              })
         }
         done()
     }
-})
+}])
+
+crawler.queue([{
+    uri: 'https://www.bbc.com/portuguese',
  
-// Queue a list of URLs
-c.queue('https://noticias.uol.com.br/')
+    callback: function (error, res, done) {
+        if (error) {
+            console.log(error)
+        } else {
+            var $ = res.$
+           
+        }
+        done()
+    }
+}])
+
+crawler.queue([{
+    uri: 'https://www.folha.uol.com.br/',
  
+    callback: function (error, res, done) {
+        if (error) {
+            console.log(error)
+        } else {
+            var $ = res.$
+            
+        }
+        done()
+    }
+}])
+
+crawler.queue([{
+    uri: 'https://www.nsctotal.com.br',
+ 
+    callback: function (error, res, done) {
+        if (error) {
+            console.log(error)
+        } else {
+            var $ = res.$
+           
+        }
+        done()
+    }
+}])
