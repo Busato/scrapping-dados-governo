@@ -4,21 +4,18 @@ const utils = require("../helper/utils.js")
 
 const crawledPages = new Map()
 const arrayOfNews = []
-const maxDepth = 1
+const MAXDEPTH = 1
 
 const Crawl = module.exports = {
     crawlUOL: async (browser, page, depth = 0) => {
   
-        console.log(`---------------------------`)
-        console.log(`Begin UOL Crawler`)
-        // Goes to subpage depth
-        if (depth > maxDepth) {
+        // Verify subpage depth
+        if (depth > MAXDEPTH) {
             return;
         }
 
         // If we've already crawled the URL, we know its children.
         if (crawledPages.has(page.url)) {
-        // console.log(`Reusing route: ${page.url}. Continuing`)
           return
         } else {
           console.log(`Loading: ${page.url}`)
@@ -31,7 +28,9 @@ const Crawl = module.exports = {
 
           // Get all the children pages and filter them
           let anchors = await newPage.evaluate(collectAllSameOriginAnchorsDeep)
-          anchors = anchors.filter(a => a !== page.url) // link doesn't point to start url of crawl.
+
+          // Filter so link doesn't point to start url of crawl.
+          anchors = anchors.filter(a => a !== page.url) 
             
           // Get only government related news
           anchors = utils.verifiyGovernmentNews(anchors)
@@ -46,16 +45,17 @@ const Crawl = module.exports = {
           currentNews.text = await newPage.evaluate(function() {
             return $('.text p').text();
           })
+          // TODO date is going with the name of the authors
           currentNews.author = await newPage.evaluate(function() {
             return $('.p-author').text();
           })
           currentNews.date = await newPage.evaluate(function() {
             return $('.author .time').text();
           })
-          // currentNews.image = 
-
           currentNews.relatedNews = anchors.map(url => ({url}))
-          crawledPages.set(page.url, page) // cache it.
+
+          // Set page crawled in crawledPages array
+          crawledPages.set(page.url, page)
       
           // Push to news array
           arrayOfNews.push(currentNews)
@@ -67,9 +67,6 @@ const Crawl = module.exports = {
         for (const childPage of page.children) {
           await Crawl.crawlUOL(browser, childPage, depth + 1)
         }
-
-        console.log(`Ending UOL Crawler`)
-        console.log(`---------------------------`)
 
         return arrayOfNews
     }
