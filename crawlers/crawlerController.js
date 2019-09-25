@@ -2,8 +2,14 @@ const puppeteer = require('puppeteer')
 const uolCrawler = require("./crawlerUol")
 
 module.exports = {
-    initiateCrawling: () => {
+    initiateCrawling: async () => {
+
+        // Initiate Browser 
+        const browser = await puppeteer.launch();
+            
         // Initiate specific crawlers
-        uolCrawler.crawlUOL(puppeteer)
+        await uolCrawler.crawlUOL(browser, {url: `https://noticias.uol.com.br/`})
+
+        await browser.close()
     }
 }

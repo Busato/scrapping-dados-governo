@@ -1,13 +1,21 @@
 {
-  "name": "scrapping-governo",
+  "name": "scrapping-dados-governo",
   "version": "1.0.0",
-  "description": "Scrapping for getting information about brazillian government",
+  "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Busato/scrapping-dados-governo.git"
+  },
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Busato/scrapping-dados-governo/issues"
+  },
+  "homepage": "https://github.com/Busato/scrapping-dados-governo#readme",
   "dependencies": {
     "puppeteer": "^1.20.0"
   }
