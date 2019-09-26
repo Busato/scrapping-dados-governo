@@ -1,25 +1,26 @@
-// https://github.com/GoogleChromeLabs/puppeteer-examples/blob/master/crawlsite.js
-
 const utils = require("../helper/utils.js")
+const fs = require('fs')
 
 const crawledPages = new Map()
 const arrayOfNews = []
+
 const MAXDEPTH = 1
 
 const Crawl = module.exports = {
-    crawlUOL: async (browser, page, depth = 0) => {
+    crawl: async (browser, page, depth = 0) => {
   
         // Verify subpage depth
         if (depth > MAXDEPTH) {
-            return;
+            return
         }
 
         // If we've already crawled the URL, we know its children.
         if (crawledPages.has(page.url)) {
           return
         } else {
-          console.log(`Loading: ${page.url}`)
-      
+
+          utils.writeSiteLog(page.url)
+
           // Setting new father page
           const newPage = await browser.newPage()
           await newPage.goto(page.url, {waitUntil: 'networkidle2', timeout: 0})
@@ -41,18 +42,18 @@ const Crawl = module.exports = {
           // Get data from current page news
           let currentNews = {}
 
+          currentNews.url = page.url
           currentNews.title = page.title
-          currentNews.text = await newPage.evaluate(function() {
-            return $('.text p').text();
+          currentNews.text = await newPage.evaluate(() => {
+            return $("article p").text()
           })
-          // TODO date is going with the name of the authors
-          currentNews.author = await newPage.evaluate(function() {
-            return $('.p-author').text();
-          })
-          currentNews.date = await newPage.evaluate(function() {
-            return $('.author .time').text();
-          })
-          currentNews.relatedNews = anchors.map(url => ({url}))
+
+          // currentNews.author = await newPage.evaluate(() => {
+          //   return $("*[class*='author']").text() 
+          // })
+          // currentNews.date = await newPage.evaluate(() => {
+          //   return $("body").text().match(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}/g)
+          // })
 
           // Set page crawled in crawledPages array
           crawledPages.set(page.url, page)
@@ -65,14 +66,14 @@ const Crawl = module.exports = {
         
         // Crawl subpages.
         for (const childPage of page.children) {
-          await Crawl.crawlUOL(browser, childPage, depth + 1)
+          await Crawl.crawl(browser, childPage, depth + 1)
         }
 
         return arrayOfNews
     }
 }
 
-collectAllSameOriginAnchorsDeep = (sameOrigin = true) => {
+collectAllSameOriginAnchorsDeep = (sameOrigin = false) => {
     const allElements = []
   
     const findAllElements = function(nodes) {
@@ -97,6 +98,6 @@ collectAllSameOriginAnchorsDeep = (sameOrigin = true) => {
         return true
       })
       .map(a => a.href)
-  
+      
     return Array.from(new Set(filtered))
-  }
+}
