@@ -1,3 +1,5 @@
+const fs = require('fs')
+
 const arrayFilteredWords = 
 [ 
     'governo',
@@ -7,7 +9,8 @@ const arrayFilteredWords =
     'congresso',
     'ministro',
     'stf',
-    'presidente'
+    'presidente',
+    'moro'
 ]
 
 module.exports = {
@@ -23,5 +26,18 @@ module.exports = {
         })
 
         return arraLinksFiltered
-    }
+    },
+
+    appendNewsToJson: arrayOfNews => {
+        fs.writeFile('news.json', JSON.stringify(arrayOfNews, null, 2), (err) => {
+            if (err) console.error(err)
+            console.log('Data written to file \n')
+        })
+    },
+
+    writeSiteLog: url => {
+        fs.appendFile('site-log.txt', `Visited: ${url} \n`, (err) => {
+          if (err) console.error(err)
+        })
+    }      
 }
