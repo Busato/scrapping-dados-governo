@@ -13,6 +13,13 @@ const arrayFilteredWords =
     'moro'
 ]
 
+const arrayCategoriesFilteredWords = 
+[ 
+    'educação',
+    'saúde',
+    'segurança'
+]
+
 module.exports = {
     verifiyGovernmentNews: (arrayLinks) => {
         let arraLinksFiltered = []
@@ -39,5 +46,17 @@ module.exports = {
         fs.appendFile('site-log.txt', `Visited: ${url} \n`, (err) => {
           if (err) console.error(err)
         })
-    }      
+    },
+    
+    getCategoryFromText: text => {
+        let arrayCategories
+        arrayCategoriesFilteredWords.forEach(category => {
+            let count = (text.match(/category/g) || []).length;
+            arrayCategories.push({ category, count})
+        });
+
+        // Returns the category with the highest count
+        return Math.max.apply(Math, arrayCategories.map((element) => { return element.count; }))
+    },
+    arrayCategoriesFilteredWords
 }

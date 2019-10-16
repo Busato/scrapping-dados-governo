@@ -36,6 +36,6 @@ module.exports = {
 
         await browser.close()
 
-        return arrayOfNews.news
+        return arrayOfNews
     }
 }

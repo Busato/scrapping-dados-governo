@@ -23,14 +23,16 @@
     </body>
     <footer>
       <script>
+        const utils = require('../helper/utils.js');
+
         function renderChart (data, labels) {
             var ctx = document.getElementById("myChart").getContext('2d');
             var myChart = new Chart(ctx, {
-                type: 'line',
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'This week',
+                        label: 'Sentiment Analysis',
                         data: data,
                     }]
                 },
@@ -39,11 +41,14 @@
 
         function getSentimentFromData (data) {
             let arraySentiments = []
-            if (data && data.news && data.news[0]) {
+            console.log(data)
+            // if (data && data.news && data.news[0]) {
+              console.log(data.news[0])
                 data.news[0].forEach(element => {
+                  console.log(element)
                     arraySentiments.push(element.sentiment)
                 });
-            }
+            //}
             console.log(arraySentiments)
             return arraySentiments
         }
@@ -57,7 +62,7 @@ $('.btn').on('click', function() {
       dataType: 'json',
       success: function(result){
           $('.spinner-border').css('display', 'none');
-          renderChart(getSentimentFromData(result), labels =  ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]);
+          renderChart(getSentimentFromData(result), utils.arrayCategoriesFilteredWords);
       }
     })
 });
