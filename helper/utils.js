@@ -49,14 +49,17 @@ module.exports = {
     },
     
     getCategoryFromText: text => {
-        let arrayCategories
+        let arrayCategories = []
         arrayCategoriesFilteredWords.forEach(category => {
-            let count = (text.match(/category/g) || []).length;
+            let count = (text.match(new RegExp(category, "g")) || []).length;
             arrayCategories.push({ category, count})
         });
 
-        // Returns the category with the highest count
-        return Math.max.apply(Math, arrayCategories.map((element) => { return element.count; }))
+        let res = Math.max.apply(Math, arrayCategories.map((element) => { return element.count; }))
+
+        let obj = arrayCategories.find(function(o){ return o.count == res; })
+
+        return (obj.count !== 0) ? obj.category : "sem categoria" 
     },
     arrayCategoriesFilteredWords
 }
