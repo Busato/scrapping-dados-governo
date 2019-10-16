@@ -3,12 +3,14 @@ const crawler = require("./crawler")
 const utils = require("../helper/utils.js")
 
 const urlsToCrawl = [
-    {url: `https://noticias.uol.com.br/`},
-    {url: `https://g1.globo.com/`},
-    {url: `https://www.nsctotal.com.br`},
-    {url: `https://www.folha.uol.com.br/`}]
+    {url: `https://noticias.uol.com.br/`}]
+    // {url: `https://g1.globo.com/`},
+    // {url: `https://www.nsctotal.com.br`},
+    // {url: `https://www.folha.uol.com.br/`}]
 
-const arrayOfNews = {}
+const arrayOfNews = {
+    news: []
+}
 
 module.exports = {
     initiateCrawling: async () => {
@@ -24,7 +26,7 @@ module.exports = {
             let currentArrayOfNews = await crawler.crawl(browser, {url: `${currentUrl.url}`})
             console.log(`Ending Crawler ${currentUrl.url} \n`)
 
-            arrayOfNews.push(currentArrayOfNews)
+            arrayOfNews.news.push(currentArrayOfNews)
         }
 
         utils.appendNewsToJson(arrayOfNews)
@@ -34,6 +36,6 @@ module.exports = {
 
         await browser.close()
 
-        return arrayOfNews
+        return arrayOfNews.news
     }
 }

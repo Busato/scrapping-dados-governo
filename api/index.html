@@ -1,10 +1,66 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <title>Análise de Sentimento</title>
   </head>
     <body>
         <h1>Análise de Sentimento</h1>
+        <h4><a href="https://github.com/Busato/scrapping-dados-governo">Github</a></h4>
         <p>Este trabalho é uma análise de sentimentos de notícias relacionadas ao governo brasileiro.</p>
-        <a href="https://github.com/Busato/scrapping-dados-governo">Github</a>
+        <a class="btn btn-primary btn-lg">Analisar</a>
+        <div class="spinner-border text-primary" role="status" style="display: none;">
+            <span class="sr-only">Analisando...</span>
+        </div>
+        <div class="container">
+            <canvas id="myChart"></canvas>
+        </div>
     </body>
+    <footer>
+      <script>
+        function renderChart (data, labels) {
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'This week',
+                        data: data,
+                    }]
+                },
+            });
+        }
+
+        function getSentimentFromData (data) {
+            let arraySentiments = []
+            if (data && data.news && data.news[0]) {
+                data.news[0].forEach(element => {
+                    arraySentiments.push(element.sentiment)
+                });
+            }
+            console.log(arraySentiments)
+            return arraySentiments
+        }
+
+$('.btn').on('click', function() {
+    $('.spinner-border').css('display', '');
+
+    $.ajax({
+      url: "http://localhost:3000/analize",
+      contentType: "application/json",
+      dataType: 'json',
+      success: function(result){
+          $('.spinner-border').css('display', 'none');
+          renderChart(getSentimentFromData(result), labels =  ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]);
+      }
+    })
+});
+</script>
+    </footer>
 </html>
