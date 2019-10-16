@@ -8,9 +8,7 @@ const urlsToCrawl = [
     {url: `https://www.nsctotal.com.br`},
     {url: `https://www.folha.uol.com.br/`}]
 
-const arrayOfNews = {
-    news: []
-}
+const arrayOfNews = {}
 
 module.exports = {
     initiateCrawling: async () => {
@@ -26,7 +24,7 @@ module.exports = {
             let currentArrayOfNews = await crawler.crawl(browser, {url: `${currentUrl.url}`})
             console.log(`Ending Crawler ${currentUrl.url} \n`)
 
-            arrayOfNews.news.push(currentArrayOfNews)
+            arrayOfNews.push(currentArrayOfNews)
         }
 
         utils.appendNewsToJson(arrayOfNews)
@@ -35,5 +33,7 @@ module.exports = {
         console.log(`--------------------------- \n`)
 
         await browser.close()
+
+        return arrayOfNews
     }
 }

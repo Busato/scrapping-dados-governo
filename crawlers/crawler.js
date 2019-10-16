@@ -1,5 +1,6 @@
 const utils = require("../helper/utils.js")
 const fs = require('fs')
+const sentiment = require('sentiment-ptbr');
 
 const crawledPages = new Map()
 const arrayOfNews = []
@@ -47,13 +48,10 @@ const Crawl = module.exports = {
           currentNews.text = await newPage.evaluate(() => {
             return $("article p").text()
           })
-
-          // currentNews.author = await newPage.evaluate(() => {
-          //   return $("*[class*='author']").text() 
-          // })
-          // currentNews.date = await newPage.evaluate(() => {
-          //   return $("body").text().match(/\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}/g)
-          // })
+          // Sentiment analysis using sentiment-ptbr lib
+          // If text wasnt retrieved, score is 0
+          currentNews.sentiment = currentNews.text ? sentiment(currentNews.text).score : 0
+          // currentNews.sentiment = currentNews.text ? sentiment(currentNews.text) : 0
 
           // Set page crawled in crawledPages array
           crawledPages.set(page.url, page)
