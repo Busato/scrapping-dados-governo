@@ -19,7 +19,8 @@ const arrayCategoriesFilteredWords =
     'saúde',
     'segurança',
     'economia',
-    'cultura'
+    'cultura',
+    'justiça'
 ]
 
 module.exports = {
@@ -41,7 +42,7 @@ module.exports = {
     appendNewsToJson: arrayOfNews => {
         fs.readFile('news.json', function (err, data) {
             let json = []
-            if (data.length > 0) {
+            if (data && data.length > 0) {
                 json = JSON.parse(data)
                 json.push(arrayOfNews)
             }

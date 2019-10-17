@@ -51,13 +51,13 @@ const Crawl = module.exports = {
 
           currentNews.date = await newPage.evaluate((utils) => {
             let date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)
-            return date.length > 0 ? date[0] : ''
+            return date && date.length > 0 ? date[0] : ''
           })
 
           // Sentiment analysis using sentiment-ptbr lib
           // If text wasnt retrieved, score is 0
           currentNews.sentiment = currentNews.text ? sentiment(currentNews.text).score : 0
-          currentNews.category = utils.getCategoryFromText(currentNews.text)
+          currentNews.label = utils.getCategoryFromText(currentNews.text)
             ? utils.getCategoryFromText(currentNews.text) : ''
 
           // Set page crawled in crawledPages array

@@ -17,26 +17,32 @@
         <div class="spinner-border text-primary" role="status" style="display: none;">
             <span class="sr-only">Analisando...</span>
         </div>
+        <span id="success-message" style="display: none;color:green">Sucesso! Scrapping terminou.</span>
+        <span id="failure-message" style="display: none;color:red">Algo deu errado! Tente novamente.</span>
+        <div class="chart-btns" style="display: none;">
+          <h3>Gerar gráficos</h3>
+          <a class="btn btn-secondary btn-lg">Sentimento x Categoria</a>
+        </div>
         <div class="container">
-            <canvas id="myChart"></canvas>
+            <canvas id="myChart" width="400" height="400"></canvas>
         </div>
     </body>
     <footer>
       <script type="text/javascript">
         $('.btn').on('click', function() {
             $('.spinner-border').css('display', '');
-
                 $.ajax({
                 url: "http://localhost:3000/analize",
                 contentType: "application/json",
                 dataType: 'json',
                 success: function(result){
                   $('.spinner-border').css('display', 'none');
-                  console.log(result);
-                  // renderChart(getSentimentFromData(result));
+                  $('#success-message').css('display', '');
+                  $('.chart-btns').css('display', '');
                 },
                 error: function (req, status, error) {
                   alert(error)
+                  $('#failure-message').css('display', '');
                   console.log(error)
                 }
             })
