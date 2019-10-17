@@ -29,8 +29,6 @@ module.exports = {
             arrayOfNews.news.push(currentArrayOfNews)
         }
 
-        utils.appendNewsToJson(arrayOfNews)
-
         console.log(`Ending Scrapper \n`)
         console.log(`--------------------------- \n`)
 

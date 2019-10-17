@@ -17,7 +17,9 @@ const arrayCategoriesFilteredWords =
 [ 
     'educação',
     'saúde',
-    'segurança'
+    'segurança',
+    'economia',
+    'cultura'
 ]
 
 module.exports = {
@@ -26,7 +28,8 @@ module.exports = {
 
         arrayLinks.map(currentLink => {
             arrayFilteredWords.map(filteredWord => {
-                if (currentLink.includes(filteredWord)) {
+                if (currentLink.match(new RegExp(`\\b${filteredWord}\\b`, "g")) &&
+                currentLink.match(new RegExp(`\\b${filteredWord}\\b`, "g")).length > 0) {
                     arraLinksFiltered.push(currentLink)
                 }
             })       
@@ -36,10 +39,18 @@ module.exports = {
     },
 
     appendNewsToJson: arrayOfNews => {
-        fs.writeFile('news.json', JSON.stringify(arrayOfNews, null, 2), (err) => {
-            if (err) console.error(err)
-            console.log('Data written to file \n')
-        })
+        fs.readFile('news.json', function (err, data) {
+            let json = []
+            if (data.length > 0) {
+                json = JSON.parse(data)
+                json.push(arrayOfNews)
+            }
+            
+            fs.writeFile('news.json', JSON.stringify(json, null, 2), (err) => {
+                if (err) console.error(err)
+                console.log('News data written to file \n')
+            })
+        })        
     },
 
     writeSiteLog: url => {

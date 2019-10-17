@@ -48,6 +48,12 @@ const Crawl = module.exports = {
           currentNews.text = await newPage.evaluate(() => {
             return $("article p").text()
           })
+
+          currentNews.date = await newPage.evaluate((utils) => {
+            let date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)
+            return date.length > 0 ? date[0] : ''
+          })
+
           // Sentiment analysis using sentiment-ptbr lib
           // If text wasnt retrieved, score is 0
           currentNews.sentiment = currentNews.text ? sentiment(currentNews.text).score : 0
@@ -57,6 +63,9 @@ const Crawl = module.exports = {
           // Set page crawled in crawledPages array
           crawledPages.set(page.url, page)
       
+          // Write news to file
+          utils.appendNewsToJson(currentNews)
+
           // Push to news array
           arrayOfNews.push(currentNews)
 
