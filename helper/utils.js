@@ -63,7 +63,7 @@ module.exports = {
     getCategoryFromText: text => {
         let arrayCategories = []
         arrayCategoriesFilteredWords.forEach(category => {
-            let count = (text.match(new RegExp(category, "g")) || []).length;
+            let count = (text.match(new RegExp(`\\b${category}\\b`, "g")) || []).length;
             arrayCategories.push({ category, count})
         });
 
