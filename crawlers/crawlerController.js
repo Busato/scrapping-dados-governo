@@ -1,12 +1,13 @@
 const puppeteer = require('puppeteer')
 const crawler = require("./crawler")
-const utils = require("../helper/utils.js")
+const fs = require('fs');
 
 const urlsToCrawl = [
-    {url: `https://noticias.uol.com.br/`}]
+    //{url: `https://noticias.uol.com.br/`}]
     // {url: `https://g1.globo.com/`},
     // {url: `https://www.nsctotal.com.br`},
-    // {url: `https://www.folha.uol.com.br/`}]
+    {url: `https://www.folha.uol.com.br/`}
+    ]
 
 const arrayOfNews = {
     news: []
@@ -17,7 +18,10 @@ module.exports = {
 
         // Initiate Browser 
         const browser = await puppeteer.launch()
-          
+
+        //Open file
+        fs.writeFileSync('news.json','[\n', { flag: 'a'});
+
         console.log(`--------------------------- \n`)
         console.log(`Beginning Scrapper \n`)
 
@@ -29,11 +33,13 @@ module.exports = {
             arrayOfNews.news.push(currentArrayOfNews)
         }
 
+        //Close file
+        fs.writeFileSync('news.json',']', { flag: 'a'});
+
         console.log(`Ending Scrapper \n`)
         console.log(`--------------------------- \n`)
 
         await browser.close()
 
-        return arrayOfNews
     }
 }

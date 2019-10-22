@@ -38,20 +38,6 @@ module.exports = {
         return arraLinksFiltered
     },
 
-    appendNewsToJson: arrayOfNews => {
-        fs.readFile('news.json', function (err, data) {
-            let json = []
-            if (data.length > 0) {
-                json = JSON.parse(data)
-                json.push(arrayOfNews)
-            }
-            
-            fs.writeFile('news.json', JSON.stringify(json, null, 2), (err) => {
-                if (err) console.error(err)
-                console.log('News data written to file \n')
-            })
-        })        
-    },
 
     writeSiteLog: url => {
         fs.appendFile('site-log.txt', `Visited: ${url} \n`, (err) => {

@@ -1,9 +1,9 @@
 const utils = require("../helper/utils.js")
 const fs = require('fs')
+const fsextra = require('fs-extra')
 const sentiment = require('sentiment-ptbr');
 
 const crawledPages = new Map()
-const arrayOfNews = []
 
 const MAXDEPTH = 1
 
@@ -19,6 +19,8 @@ const Crawl = module.exports = {
         if (crawledPages.has(page.url)) {
           return
         } else {
+          // Set page crawled in crawledPages array
+          crawledPages.set(page.url, page)
 
           utils.writeSiteLog(page.url)
 
@@ -60,14 +62,13 @@ const Crawl = module.exports = {
           currentNews.category = utils.getCategoryFromText(currentNews.text)
             ? utils.getCategoryFromText(currentNews.text) : ''
 
-          // Set page crawled in crawledPages array
-          crawledPages.set(page.url, page)
-      
+          //fsextra.writeJsonSync('news.json', currentNews, { flag: 'a'});
+          fs.writeFileSync('news.json', JSON.stringify(currentNews) +',\n', { flag: 'a'});
           // Write news to file
-          utils.appendNewsToJson(currentNews)
+          //utils.appendNewsToJson(currentNews);
 
           // Push to news array
-          arrayOfNews.push(currentNews)
+          //arrayOfNews.push(currentNews)
 
           await newPage.close()
         }
@@ -76,8 +77,6 @@ const Crawl = module.exports = {
         for (const childPage of page.children) {
           await Crawl.crawl(browser, childPage, depth + 1)
         }
-
-        return arrayOfNews
     }
 }
 
@@ -108,4 +107,8 @@ collectAllSameOriginAnchorsDeep = (sameOrigin = false) => {
       .map(a => a.href)
       
     return Array.from(new Set(filtered))
+}
+
+deepSearch = () => {
+
 }
