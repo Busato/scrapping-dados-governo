@@ -57,6 +57,5 @@ module.exports = {
         let obj = arrayCategories.find(function(o){ return o.count == res; })
 
         return (obj.count !== 0) ? obj.category : "sem categoria" 
-    },
-    arrayCategoriesFilteredWords
+    }
 }

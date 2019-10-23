@@ -48,12 +48,38 @@ const Crawl = module.exports = {
           currentNews.url = page.url
           currentNews.title = page.title
           currentNews.text = await newPage.evaluate(() => {
-            return $("article p").text()
+            let text = $("article p").text()
+            console.log(text);
+            if(text && text.length > 140)
+              return text;
+
+            text = ""
+            let childNodes = $('body').contents()
+            console.log('iniciando deep');
+            for(let el in childNodes){
+              if(childNodes[el] && !isNaN(el)){
+                if(childNodes[el].textContent && childNodes[el].textContent.length > 140){
+                  if(!childNodes[el].textContent.includes('<') && !childNodes[el].textContent.includes('>')){
+                    text = text.concat(childNodes[el].textContent, " ");
+                  }
+                }
+                console.log("deepsearch:",text);
+                if(childNodes[el].childNodes && childNodes[el].childNodes.length > 0)
+                  childNodes = [...childNodes, ...childNodes[el].childNodes]
+              }
+            }
+
+            //removing line breaks, json and html tags
+            return text
+                .replace(/(\[.*?\])/g, "")
+                .replace(/(\{.*?\})/g, "")
+                .replace(/<\/?[^>]+(>|$)/g, "")
+                .replace(/\r?\n|\r/g, " ");
           })
 
           currentNews.date = await newPage.evaluate((utils) => {
             let date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)
-            return date.length > 0 ? date[0] : ''
+            return date && date.length > 0 ? date[0] : ''
           })
 
           // Sentiment analysis using sentiment-ptbr lib
@@ -107,8 +133,4 @@ collectAllSameOriginAnchorsDeep = (sameOrigin = false) => {
       .map(a => a.href)
       
     return Array.from(new Set(filtered))
-}
-
-deepSearch = () => {
-
-}
+};
