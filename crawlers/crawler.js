@@ -4,6 +4,7 @@ const fsextra = require('fs-extra')
 const sentiment = require('sentiment-ptbr');
 
 const crawledPages = new Map()
+const arrayOfNews = []
 
 const MAXDEPTH = 1
 
@@ -85,7 +86,7 @@ const Crawl = module.exports = {
           // Sentiment analysis using sentiment-ptbr lib
           // If text wasnt retrieved, score is 0
           currentNews.sentiment = currentNews.text ? sentiment(currentNews.text).score : 0
-          currentNews.label = utils.getCategoryFromText(currentNews.text)
+          currentNews.category = utils.getCategoryFromText(currentNews.text)
             ? utils.getCategoryFromText(currentNews.text) : ''
 
           //fsextra.writeJsonSync('news.json', currentNews, { flag: 'a'});
@@ -94,7 +95,7 @@ const Crawl = module.exports = {
           //utils.appendNewsToJson(currentNews);
 
           // Push to news array
-          //arrayOfNews.push(currentNews)
+          arrayOfNews.push(currentNews)
 
           await newPage.close()
         }
@@ -103,6 +104,8 @@ const Crawl = module.exports = {
         for (const childPage of page.children) {
           await Crawl.crawl(browser, childPage, depth + 1)
         }
+
+        return arrayOfNews
     }
 }
 

@@ -24,7 +24,18 @@
           <a class="btn btn-secondary btn-lg">Sentimento x Categoria</a>
         </div>
         <div class="container">
-            <canvas id="myChart" width="400" height="400"></canvas>
+          <div style="width:75%;">
+            <h2>Gráfico Número de notícias por categoria</h2>
+            <canvas id="myChartCategory" width="400" height="400"></canvas>
+          </div>
+          <div style="width:75%;">
+            <h2>Gráfico Sentimento por categoria</h2>
+            <canvas id="myChartCategorySentiment" width="400" height="400"></canvas>
+          </div>
+          <div style="width:75%;">
+            <h2>Gráfico Número de notícias por categoria</h2>
+            <canvas id="myChartDate" width="400" height="400"></canvas>
+          </div>
         </div>
     </body>
     <footer>
@@ -43,6 +54,8 @@
                 success: function(result){
                   $('.spinner-border').css('display', 'none');
                   renderChartPerCategory(result);
+                  renderChartPerCategorySentiment(result);
+                  // renderChartPerDate(result);
                 },
                 error: function (req, status, error) {
                   alert(error)
@@ -54,37 +67,117 @@
         $('.btn').one('click', clickHandler);
         
         function getDataFromResult (dataName, result) {
-          console.log(result)
           let arrayResults = []
           
           result.forEach(currentNews => {
             let attributeFound = arrayResults.find((element)=>{
-              return element === currentNews[dataName]
+              return element && element[dataName] === currentNews[dataName]
             })
 
-            if (!attributeFound) {
-              arrayResults.push({category: currentNews[dataName], value: 0 })
+            if (typeof attributeFound === 'undefined') {
+              let currentObj = {}
+              currentObj[dataName] = currentNews[dataName]
+              currentObj.value =  1
+              arrayResults.push(currentObj)
             } else {
               arrayResults = arrayResults.map((element)=>{
-                if (element.category === currentNews[dataName]) {
+                if (element && element[dataName] === currentNews[dataName]) {
                   element.value += 1
                 }
+                return element
               })
             }
           });
-          console.log(arrayResults)
           return arrayResults
         }
 
+        function getDataFromResultSentiment (dataName, result) {
+          let arrayResults = []
+          
+          result.forEach(currentNews => {
+            let attributeFound = arrayResults.find((element)=>{
+              return element && element[dataName] === currentNews[dataName]
+            })
+
+            if (typeof attributeFound === 'undefined') {
+              let currentObj = {}
+              currentObj[dataName] = currentNews[dataName]
+              currentObj.sentiment =  currentNews.sentiment
+              arrayResults.push(currentObj)
+            } else {
+              arrayResults = arrayResults.map((element)=>{
+                if (element && element[dataName] === currentNews[dataName]) {
+                  element.sentiment += currentNews.sentiment
+                }
+                return element
+              })
+            }
+          });
+          return arrayResults
+        }
+
+        function getRandomColors (howManyColors) {
+          let arrayOfColors = []
+          for (let index = 0; index < howManyColors; index++) {
+            var r = Math.floor(Math.random() * 255);
+            var g = Math.floor(Math.random() * 255);
+            var b = Math.floor(Math.random() * 255);
+
+            arrayOfColors.push("rgb(" + r + "," + g + "," + b + ")")
+          }
+          return arrayOfColors;   
+        }
+        
         function renderChartPerCategory (result) {
-          var ctx = document.getElementById("myChart").getContext('2d');
+          let resultCategory = getDataFromResult ("category", result.data.news[0]);
+          let colors = getRandomColors (resultCategory.length);
+
+          var ctx = document.getElementById("myChartCategory").getContext('2d');
           var myChart = new Chart(ctx, {
               type: 'bar',
               data: {
-                  labels: getDataFromResult ("category", result.data.news[0]),
+                  labels: resultCategory.map(({ category }) => category),
                   datasets: [{
-                      label: 'Sentiment Analysis',
-                      data: [1,2,3],
+                      label: 'Number of news',
+                      data: resultCategory.map(({ value }) => value),
+                      backgroundColor: colors,
+                      borderColor: colors,
+                  }]
+              },
+          });
+        }
+        function renderChartPerCategorySentiment (result) {
+          let resultCategory = getDataFromResultSentiment ("category", result.data.news[0]);
+          let colors = getRandomColors (resultCategory.length);
+
+          var ctx = document.getElementById("myChartCategorySentiment").getContext('2d');
+          var myChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: resultCategory.map(({ category }) => category),
+                  datasets: [{
+                      label: 'Sentiment of news',
+                      data: resultCategory.map(({ sentiment }) => sentiment),
+                      backgroundColor: colors,
+                      borderColor: colors,
+                  }]
+              },
+          });
+        }
+        function renderChartPerDate (result) {
+          let resultCategory = getDataFromResult ("date", result.data.news[0]);
+          let colors = getRandomColors (resultCategory.length);
+
+          var ctx = document.getElementById("myChartDate").getContext('2d');
+          var myChart = new Chart(ctx, {
+              type: 'vertical',
+              data: {
+                  labels: resultCategory.map(({ date }) => date),
+                  datasets: [{
+                      label: 'Number of news',
+                      data: resultCategory.map(({ value }) => value),
+                      backgroundColor: colors,
+                      borderColor: colors,
                   }]
               },
           });
