@@ -4,9 +4,9 @@ const fs = require('fs');
 
 const urlsToCrawl = [
     {url: `https://noticias.uol.com.br/`},
-    // {url: `https://g1.globo.com/`},
-    // {url: `https://www.nsctotal.com.br`},
-    //{url: `https://www.folha.uol.com.br/`}
+    {url: `https://g1.globo.com/`},
+    {url: `https://www.nsctotal.com.br`},
+    {url: `https://www.folha.uol.com.br/`}
     ]
 
 const arrayOfNews = {

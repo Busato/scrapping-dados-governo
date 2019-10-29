@@ -86,7 +86,7 @@ const Crawl = module.exports = {
           // Sentiment analysis using sentiment-ptbr lib
           // If text wasnt retrieved, score is 0
           currentNews.sentiment = currentNews.text ? sentiment(currentNews.text).score : 0
-          currentNews.label = utils.getCategoryFromText(currentNews.text)
+          currentNews.category = utils.getCategoryFromText(currentNews.text)
             ? utils.getCategoryFromText(currentNews.text) : ''
 
           //fsextra.writeJsonSync('news.json', currentNews, { flag: 'a'});
