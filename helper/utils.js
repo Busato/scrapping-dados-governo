@@ -3,14 +3,22 @@ const fs = require('fs')
 const arrayFilteredWords = 
 [ 
     'governo',
+    'jair',
     'bolsonaro',
+    'weintraub',
     'guedes',
     'politica',
     'congresso',
     'ministro',
+    'ministério',
     'stf',
     'presidente',
-    'moro'
+    'moro',
+    'corrupcao',
+    'legislativo',
+    'democracia',
+    'executivo',
+    'judiciario',
 ]
 
 const arrayCategoriesFilteredWords = 
@@ -20,7 +28,9 @@ const arrayCategoriesFilteredWords =
     'segurança',
     'economia',
     'cultura',
-    'justiça'
+    'justiça',
+    'trabalho',
+    'meio ambiente',
 ]
 
 module.exports = {
@@ -72,6 +82,5 @@ module.exports = {
         let obj = arrayCategories.find(function(o){ return o.count == res; })
 
         return (obj.count !== 0) ? obj.category : "sem categoria" 
-    },
-    arrayCategoriesFilteredWords
+    }
 }
