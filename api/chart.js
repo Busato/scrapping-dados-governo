@@ -15,17 +15,3 @@ function renderChart (data) {
         },
     });
 }
-
-function getSentimentFromData (data) {
-    let arraySentiments = []
-    console.log(data)
-    // if (data && data.news && data.news[0]) {
-      console.log(data.news[0])
-        data.news[0].forEach(element => {
-          console.log(element)
-            arraySentiments.push(element.sentiment)
-        });
-    //}
-    console.log(arraySentiments)
-    return arraySentiments
-}

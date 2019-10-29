@@ -23,24 +23,65 @@
     </body>
     <footer>
       <script type="text/javascript">
-        $('.btn').on('click', function() {
-            $('.spinner-border').css('display', '');
-
-                $.ajax({
+        var clickHandler = function(e) {
+          e.preventDefault()
+          $('.btn').css('display', 'none');
+          $('.spinner-border').css('display', '');
+              $.ajax({
                 url: "http://localhost:3000/analize",
+                type: 'GET',
                 contentType: "application/json",
+                async: false,
+                cache: false,
                 dataType: 'json',
                 success: function(result){
                   $('.spinner-border').css('display', 'none');
-                  console.log(result);
-                  // renderChart(getSentimentFromData(result));
+                  renderChartPerCategory(result);
                 },
                 error: function (req, status, error) {
                   alert(error)
                   console.log(error)
                 }
             })
-        });
+        }
+        $('.btn').one('click', clickHandler);
+        
+        function getDataFromResult (dataName, result) {
+          console.log(result)
+          let arrayResults = []
+          
+          result.forEach(currentNews => {
+            let attributeFound = arrayResults.find((element)=>{
+              return element === currentNews[dataName]
+            })
+
+            if (!attributeFound) {
+              arrayResults.push({category: currentNews[dataName], value: 0 })
+            } else {
+              arrayResults = arrayResults.map((element)=>{
+                if (element.category === currentNews[dataName]) {
+                  element.value += 1
+                }
+              })
+            }
+          });
+          console.log(arrayResults)
+          return arrayResults
+        }
+
+        function renderChartPerCategory (result) {
+          var ctx = document.getElementById("myChart").getContext('2d');
+          var myChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                  labels: getDataFromResult ("category", result.data.news[0]),
+                  datasets: [{
+                      label: 'Sentiment Analysis',
+                      data: [1,2,3],
+                  }]
+              },
+          });
+        }
       </script>
     </footer>
 </html>

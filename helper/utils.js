@@ -3,14 +3,22 @@ const fs = require('fs')
 const arrayFilteredWords = 
 [ 
     'governo',
+    'jair',
     'bolsonaro',
+    'weintraub',
     'guedes',
     'politica',
     'congresso',
     'ministro',
+    'ministério',
     'stf',
     'presidente',
-    'moro'
+    'moro',
+    'corrupcao',
+    'legislativo',
+    'democracia',
+    'executivo',
+    'judiciario',
 ]
 
 const arrayCategoriesFilteredWords = 
@@ -19,7 +27,9 @@ const arrayCategoriesFilteredWords =
     'saúde',
     'segurança',
     'economia',
-    'cultura'
+    'cultura',
+    'trabalho',
+    'meio ambiente',
 ]
 
 module.exports = {
