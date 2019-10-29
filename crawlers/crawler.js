@@ -4,6 +4,7 @@ const fsextra = require('fs-extra')
 const sentiment = require('sentiment-ptbr');
 
 const crawledPages = new Map()
+const arrayOfNews = []
 
 const MAXDEPTH = 1
 
@@ -94,7 +95,7 @@ const Crawl = module.exports = {
           //utils.appendNewsToJson(currentNews);
 
           // Push to news array
-          //arrayOfNews.push(currentNews)
+          arrayOfNews.push(currentNews)
 
           await newPage.close()
         }
@@ -103,6 +104,8 @@ const Crawl = module.exports = {
         for (const childPage of page.children) {
           await Crawl.crawl(browser, childPage, depth + 1)
         }
+
+        return arrayOfNews
     }
 }
 
