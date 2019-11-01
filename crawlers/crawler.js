@@ -77,6 +77,7 @@ const Crawl = module.exports = {
                 .replace(/<\/?[^>]+(>|$)/g, "")
                 .replace(/\r?\n|\r/g, " ");
           })
+          currentNews.text = utils.removeStopWords(currentNews.text)
 
           currentNews.date = await newPage.evaluate((utils) => {
             let date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)

@@ -33,6 +33,8 @@ const arrayCategoriesFilteredWords =
     'meio ambiente',
 ]
 
+const stopwords = (fs.readFileSync('stopwords.txt')).toString().split('\n');
+
 module.exports = {
     verifiyGovernmentNews: (arrayLinks) => {
         let arraLinksFiltered = []
@@ -82,5 +84,14 @@ module.exports = {
         let obj = arrayCategories.find(function(o){ return o.count == res; })
 
         return (obj.count !== 0) ? obj.category : "sem categoria" 
+    },
+
+    removeStopWords: text => {
+        for(let word of stopwords) {
+            let regexp = new RegExp("\\b"+word.trim()+"\\b", "g")
+            if(text.match(regexp))
+                text = text.replace(regexp, "")
+        }
+        return text;
     }
 }
