@@ -50,13 +50,11 @@ const Crawl = module.exports = {
           currentNews.title = page.title
           currentNews.text = await newPage.evaluate(() => {
             let text = $("article p").text()
-            console.log(text);
             if(text && text.length > 140)
               return text;
 
             text = ""
             let childNodes = $('body').contents()
-            console.log('iniciando deep');
             for(let el in childNodes){
               if(childNodes[el] && !isNaN(el)){
                 if(childNodes[el].textContent && childNodes[el].textContent.length > 140){
@@ -72,10 +70,12 @@ const Crawl = module.exports = {
 
             //removing line breaks, json and html tags
             return text
+                .replace(/\s\s+/g, " ")
                 .replace(/(\[.*?\])/g, "")
                 .replace(/(\{.*?\})/g, "")
                 .replace(/<\/?[^>]+(>|$)/g, "")
-                .replace(/\r?\n|\r/g, " ");
+                .replace(/\r?\n|\r/g, " ")
+                .replace(/<[^>]+>/g, "");
           })
           currentNews.text = utils.removeStopWords(currentNews.text)
 
