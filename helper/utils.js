@@ -92,6 +92,7 @@ module.exports = {
             if(text.match(regexp))
                 text = text.replace(regexp, "")
         }
+
         return text;
     }
 }
