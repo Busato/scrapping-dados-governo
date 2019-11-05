@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Busato/scrapping-dados-governo#readme",
   "dependencies": {
     "chart.js": "^2.8.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "fs-extra": "^8.1.0",

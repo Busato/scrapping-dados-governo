@@ -1,5 +1,5 @@
 const handler = require('../handler/handler');
-const crawlerController = require("../../crawlers/crawlerController.js")
+const crawlerController = require("../crawlers/crawlerController.js")
 
 const getSentimentanalysis = async (req, res) => {
   try {

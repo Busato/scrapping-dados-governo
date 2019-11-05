@@ -13,6 +13,11 @@ router.get('/', (req, res) => {
   res.sendFile('index.html', { root: __dirname });
 });
 
+// Starts the root route
+router.get('/news', (req, res) => {
+  res.sendFile('news.json', { root: __dirname });
+});
+
 // Starts the number value route
 router.get('/analize', getSentimentanalysis);
 
