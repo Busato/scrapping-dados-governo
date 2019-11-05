@@ -49,20 +49,30 @@ const Crawl = module.exports = {
           currentNews.url = page.url
           currentNews.title = page.title
           currentNews.text = await newPage.evaluate(() => {
-            let text = $("article p").text()
+            //cleaning page
+            for(let selector of ['script', 'noscript', 'style',
+                'img', 'iframe', 'header', 'li', 'ul', 'button',
+                'svg', 'meta', 'audima-div', 'figure', 'footer',
+                'aside'])
+              document.querySelectorAll(selector).forEach(el => el.outerHTML = "");
+
+            //add jQuery
+            var s = document.createElement("script");
+            s.type = "text/javascript";
+            s.src = "https://code.jquery.com/jquery-3.2.1.min.js";
+            $("body").append(s);
+
+            //extract text
+            let text = $("article p").text() || $("article p").innerText || "";
             if(text && text.length > 140)
               return text;
 
-            text = ""
             let childNodes = $('body').contents()
             for(let el in childNodes){
               if(childNodes[el] && !isNaN(el)){
                 if(childNodes[el].textContent && childNodes[el].textContent.length > 140){
-                  if(!childNodes[el].textContent.includes('<') && !childNodes[el].textContent.includes('>')){
                     text = text.concat(childNodes[el].textContent, " ");
-                  }
                 }
-                console.log("deepsearch:",text);
                 if(childNodes[el].childNodes && childNodes[el].childNodes.length > 0)
                   childNodes = [...childNodes, ...childNodes[el].childNodes]
               }
@@ -77,7 +87,8 @@ const Crawl = module.exports = {
                 .replace(/\r?\n|\r/g, " ")
                 .replace(/<[^>]+>/g, "");
           })
-          currentNews.text = utils.removeStopWords(currentNews.text)
+
+          //currentNews.text = utils.removeStopWords(currentNews.text)
 
           currentNews.date = await newPage.evaluate((utils) => {
             let date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)
