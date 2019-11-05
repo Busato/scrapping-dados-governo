@@ -6,6 +6,16 @@ const arrayPartidosPoliticos =
     'REDE', 'PSTU', 'PCB', 'PCO',
 ]
 
+const arrayMinistros = 
+[
+    'Tereza Cristina', 'Osmar Terra', 'Marcos Pontes', 'Fernando Azevedo e Silva', 'Gustavo Canuto',
+    'Paulo Guedes', 'Abraham Weintraub', 'Tarcísio Gomes de Freitas',
+    'Sérgio Moro', 'Ricardo Salles', 'Bento Albuquerque', 'Damares Alves',
+    'Ernesto Araújo', 'Luiz Henrique Mandetta', 'Marcelo Álvaro Antônio', 'Wagner Rosário',
+    'Luiz Eduardo Ramos', 'Jorge Oliveira', 'André Luiz de Almeida Mendonça',
+    'Roberto Campos Neto', 'Onyx Lorenzoni', 'Augusto Heleno',
+]
+
 const getDataFromResult = (dataName, result) => {
     let arrayResults = []
     
@@ -75,9 +85,15 @@ const getRandomColors = (howManyColors) => {
     return arrayOfColors;   
 }
 
-const sortByDate = (result) => {
+const sortByDate = (result) => {  
     return result.sort(function(a,b) {
-      return new Date(b.date).toLocaleDateString('pt-BR') - new Date(a.date).toLocaleDateString('pt-BR');
+      var partesDataA = a.date.split("/");
+      var dataA = new Date(partesDataA[2], partesDataA[1] - 1, partesDataA[0]);
+      
+      var partesDataB = b.date.split("/");
+      var dataB = new Date(partesDataB[2], partesDataB[1] - 1, partesDataB[0]);
+
+      return dataA - dataB;
     });
 }
 
@@ -116,7 +132,40 @@ const findWordThatMostAppearsInString = (arrayResults, arrayOfWords) => {
     return wordCounts
 }
 
-  
+const findSentenceThatMostAppearsInString = (arrayResults, arrayOfWords) => {
+  let wordCounts = []
+
+  arrayResults.forEach(result => {
+    if (!result.text || result.text === '') return
+
+    arrayOfWords.forEach(wordToMatch => {
+      console.log(wordToMatch)
+      let regexp = new RegExp(wordToMatch, "g")
+      let arrayString = result.text.match(regexp);
+      console.log(arrayString)
+        if (arrayString && arrayString.length > 0) {
+          let attributeFound = wordCounts.find((element)=>{
+            return element && element.name === wordToMatch
+          })
+
+          if (typeof attributeFound === 'undefined') {
+            let currentObj = {}
+            currentObj.name =  wordToMatch
+            currentObj.sentiment =  arrayString.length*result.sentiment
+            wordCounts.push(currentObj)
+          } else {
+            wordCounts = wordCounts.map((element)=>{
+                if (element && element.name === wordToMatch) {
+                  element.sentiment += arrayString.length*result.sentiment
+                }
+                return element
+              })
+          }
+        } 
+    });
+  });
+    return wordCounts
+}
 const clickHandler = function(e) {
     e.preventDefault()
     $('.btn').css('display', 'none');
@@ -134,7 +183,8 @@ const clickHandler = function(e) {
           renderChartSentimentPerDateTrabalho(result);
           renderChartSentimentPerDateSaude(result);
           renderChartPartidosLessSentimentEconomia(result)
-          renderChartPartidosLessSentimentCultura(result)
+          renderChartPartidosLessSentimentSegurança(result)
+          renderChartSentimentPerMinistros(result)
         },
         error: function (req, status, error) {
           alert(error)

@@ -88,7 +88,7 @@ const Crawl = module.exports = {
                 .replace(/<[^>]+>/g, "");
           })
 
-          //currentNews.text = utils.removeStopWords(currentNews.text)
+          currentNews.text = utils.removeStopWords(currentNews.text)
 
           currentNews.date = await newPage.evaluate((utils) => {
             let date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/)
@@ -102,7 +102,7 @@ const Crawl = module.exports = {
             ? utils.getCategoryFromText(currentNews.text) : ''
 
           //fsextra.writeJsonSync('news.json', currentNews, { flag: 'a'});
-          fs.writeFileSync('news.json', JSON.stringify(currentNews) +',\n', { flag: 'a'});
+          fs.writeFileSync(__dirname + '/../news.json', JSON.stringify(currentNews) +',\n', { flag: 'a'});
           // Write news to file
           //utils.appendNewsToJson(currentNews);
 
