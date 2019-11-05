@@ -1,3 +1,11 @@
+const arrayPartidosPoliticos = 
+[
+    'MDB', 'PT', 'PSDB', 'PP', 'PP', 'PDT', 'PTB', 'DEM',
+    'PL', 'PSB', 'PSC', 'PCdoB', 'PV', 'PSD', 'PSL', 'PMN',
+    'PTC', 'DC', 'PODE', 'PSOL', 'PRTB', 'PROS', 'PMB', 'NOVO',
+    'REDE', 'PSTU', 'PCB', 'PCO',
+]
+
 const getDataFromResult = (dataName, result) => {
     let arrayResults = []
     
@@ -73,23 +81,43 @@ const sortByDate = (result) => {
     });
 }
 
-const findWordThatMostAppearsInString = (string) => {
-    let wordCounts = []
-    let arrayOfWords = string.split(/\s+/);
-    console.log(arrayOfWords)
-    arrayOfWords.forEach(word => {
-      if (typeof wordCounts[word] === 'undefined') {
-            wordCounts[word] = 1;
-        } else {
-            wordCounts[word] += 1;
-        }
+const findWordThatMostAppearsInString = (arrayResults, arrayOfWords) => {
+  let wordCounts = []
+
+  arrayResults.forEach(result => {
+    if (!result.text || result.text === '') return
+
+    let arrayString = result.text.split(/\s+/);
+
+    arrayString.forEach(word => {
+      arrayOfWords.forEach(wordToMatch => {
+        if (wordToMatch === word) {
+          let attributeFound = wordCounts.find((element)=>{
+            return element && element.name === wordToMatch
+          })
+
+          if (typeof attributeFound === 'undefined') {
+            let currentObj = {}
+            currentObj.name =  word
+            currentObj.sentiment =  result.sentiment
+            wordCounts.push(currentObj)
+          } else {
+            wordCounts = wordCounts.map((element)=>{
+                if (element && element.name === wordToMatch) {
+                  element.sentiment += result.sentiment
+                }
+                return element
+              })
+          }
+        } 
+      });
     });
+  });
     return wordCounts
 }
 
   
 const clickHandler = function(e) {
-    console.log('passou')
     e.preventDefault()
     $('.btn').css('display', 'none');
     $('.spinner-border').css('display', '');
@@ -101,11 +129,12 @@ const clickHandler = function(e) {
         crossDomain: true,
         success: function(result){
           $('.spinner-border').css('display', 'none');
-          // renderChartPerCategory(result);
-          // renderChartPerCategorySentiment(result);
-          // renderChartSentimentPerDateTrabalho(result);
-          // renderChartSentimentPerDateSaude(result);
-          renderChartPartidosLessSentimentJustica(result)
+          renderChartPerCategory(result);
+          renderChartPerCategorySentiment(result);
+          renderChartSentimentPerDateTrabalho(result);
+          renderChartSentimentPerDateSaude(result);
+          renderChartPartidosLessSentimentEconomia(result)
+          renderChartPartidosLessSentimentCultura(result)
         },
         error: function (req, status, error) {
           alert(error)

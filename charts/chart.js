@@ -49,7 +49,6 @@ function renderChartPerCategorySentiment (result) {
 
     let resultCategoria = getDataFromResultSentiment("date", 
     getOnlyNewsFromCategory(newsResult, 'trabalho'));
-    console.log(resultCategoria)
     var ctx = document.getElementById("myChartDateTrabalho").getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
@@ -57,7 +56,7 @@ function renderChartPerCategorySentiment (result) {
             labels: resultCategoria.map(({ date }) => date),
             datasets: [
               {
-                label: 'Sentimento para categoria trabalho',
+                label: 'Sentimento para categoria trabalho por tempo',
                 fill: false,
                 data: resultCategoria.map(({ sentiment }) => sentiment),
                 borderColor: colors[0],
@@ -75,7 +74,7 @@ function renderChartPerCategorySentiment (result) {
     let colors = getRandomColors (newsResult.length);
 
     let resultCategoria = getDataFromResultSentiment("date", 
-    getOnlyNewsFromCategory(newsResult, 'sem categoria'));
+    getOnlyNewsFromCategory(newsResult, 'saude'));
     console.log(resultCategoria)
     var ctx = document.getElementById("myChartDateSaude").getContext('2d');
     var myChart = new Chart(ctx, {
@@ -84,7 +83,7 @@ function renderChartPerCategorySentiment (result) {
             labels: resultCategoria.map(({ date }) => date),
             datasets: [
               {
-                label: 'Sentimento para categoria saude',
+                label: 'Sentimento para categoria saude por tempo',
                 fill: false,
                 data: resultCategoria.map(({ sentiment }) => sentiment),
                 borderColor: colors[0],
@@ -98,23 +97,54 @@ function renderChartPerCategorySentiment (result) {
 
   function renderChartPartidosLessSentimentEconomia (result) {
     let newsResult = result
-    let colors = getRandomColors (newsResult.length);
 
-    let resultSemCategoria = getOnlyNewsFromCategory(newsResult, 'economia');
+    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'economia');
 
-    let arrayMostWords = findWordThatMostAppearsInString(resultSemCategoria[0].text, )
-    console.log(arrayMostWords)
+    let arrayResults = findWordThatMostAppearsInString(resultCategoria, arrayPartidosPoliticos)
+
+    let colors = getRandomColors (arrayResults.length);
+
     var ctx = document.getElementById("myChartChartPartidosLessSentimentEconomia").getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: arrayMostWords.map.keys(),
+            labels: arrayResults.map(({name}) => name),
             datasets: [
               {
-                label: 'Sentimento para categoria sem categoria',
+                label: 'Sentimento relacionados a economia para partidos',
                 fill: false,
-                data: resultSemCategoria.map(({ value }) => value),
-                borderColor: colors[0],
+                data: arrayResults.map(({sentiment}) => sentiment),
+                borderColor: colors,
+                backgroundColor: colors,
+                responsive: true,
+                maintainAspectRatio: false,
+              },
+          ]
+        },
+    });
+  }
+
+  function renderChartPartidosLessSentimentCultura (result) {
+    let newsResult = result
+
+    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'cultura');
+
+    let arrayResults = findWordThatMostAppearsInString(resultCategoria, arrayPartidosPoliticos)
+
+    let colors = getRandomColors (arrayResults.length);
+
+    var ctx = document.getElementById("myChartChartPartidosLessSentimentCultura").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: arrayResults.map(({name}) => name),
+            datasets: [
+              {
+                label: 'Sentimento relacionados a cultura para partidos',
+                fill: false,
+                data: arrayResults.map(({sentiment}) => sentiment),
+                borderColor: colors,
+                backgroundColor: colors,
                 responsive: true,
                 maintainAspectRatio: false,
               },
