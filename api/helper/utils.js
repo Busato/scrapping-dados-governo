@@ -94,5 +94,18 @@ module.exports = {
                 textFiltered = textFiltered.replace(regexp, " ")
         }
         return textFiltered;
+    },
+
+    doNotCrawl: (url) => {
+        [
+            'facebook.com',
+            'twitter.com',
+            'instagram.com',
+            'linkedin.com'
+        ].forEach(value => {
+            if(url.includes(value))
+                return true;
+        });
+        return false;
     }
 }

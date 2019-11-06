@@ -50,10 +50,10 @@ const Crawl = module.exports = {
           currentNews.title = page.title
           currentNews.text = await newPage.evaluate(() => {
             //cleaning page
-            for(let selector of ['script', 'noscript', 'style',
+            for(let selector of ['script','noscript', 'style',
                 'img', 'iframe', 'header', 'li', 'ul', 'button',
                 'svg', 'meta', 'audima-div', 'figure', 'footer',
-                'aside'])
+                'aside', 'form'])
               document.querySelectorAll(selector).forEach(el => el.outerHTML = "");
 
             //add jQuery
@@ -63,20 +63,50 @@ const Crawl = module.exports = {
             $("body").append(s);
 
             //extract text
-            let text = $("article p").text() || $("article p").innerText || "";
-            if(text && text.length > 140)
-              return text;
+            let text = "";
 
+            //1) get text from article
+            let stepOneText = "";
+            //article p is always good, so just return it
+            if( $("article p").text().length > 700 )
+              return $("article p").text();
+            //article div may not be good, so we gotta test it
+            else if( $("article div").text().length > 700)
+              stepOneText = $("article div").text();
+
+            //2) if step 1 doesn't work, extract text elements based on common class names for those elements
+            let stepTwoText = "";
+            let elementsByClass = document.querySelectorAll("p[class*='aragraph'], p[class*='ext'], div[class*='aragraph'], div[class*='ext']")
+            for(let i = 0; i < elementsByClass.length; i++) {
+              if(elementsByClass[i].textContent.length > 280){
+                stepTwoText = stepTwoText.concat(elementsByClass[i].textContent.trim(), " ")
+              }
+            }
+
+            //3) if step 2 doesn't work, extract all the contents from the body with more than 700 words
+            let stepThreeText = "";
             let childNodes = $('body').contents()
             for(let el in childNodes){
               if(childNodes[el] && !isNaN(el)){
-                if(childNodes[el].textContent && childNodes[el].textContent.length > 140){
-                    text = text.concat(childNodes[el].textContent, " ");
+                if(childNodes[el].textContent && childNodes[el].textContent.split(" ").length > 100){
+                  stepThreeText = stepThreeText.concat(childNodes[el].textContent.trim(), " ");
                 }
                 if(childNodes[el].childNodes && childNodes[el].childNodes.length > 0)
                   childNodes = [...childNodes, ...childNodes[el].childNodes]
               }
             }
+
+            //check which extraction was better
+            //TODO word count, if text has <> or {}, pr [], [cadastre-se, assine, acesse, encontre, assinantes], upper case words joinend, words longer than 30 chars (can be joined words)
+            let wordcount1 = stepOneText.split(" ").length;
+            let wordcount2 = stepTwoText.split(" ").length;
+            let wordcount3 = stepThreeText.split(" ").length;
+            if(wordcount1 > wordcount2 && wordcount1 > wordcount3)
+              text = stepOneText
+            if(wordcount2 > wordcount1 && wordcount2 > wordcount3)
+              text = stepTwoText
+            if(wordcount3 > wordcount2 && wordcount3 > wordcount1)
+              text = stepThreeText
 
             //removing line breaks, json and html tags
             return text
