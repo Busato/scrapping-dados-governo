@@ -50,7 +50,7 @@ const Crawl = module.exports = {
           currentNews.title = page.title
           currentNews.text = await newPage.evaluate(() => {
             //cleaning page
-            for(let selector of ['script', 'noscript', 'style',
+            for(let selector of ['noscript', 'style',
                 'img', 'iframe', 'header', 'li', 'ul', 'button',
                 'svg', 'meta', 'audima-div', 'figure', 'footer',
                 'aside', 'form'])
@@ -63,20 +63,39 @@ const Crawl = module.exports = {
             $("body").append(s);
 
             //extract text
-            if($("article p").text() > 700)
-              return $("article p").text();
-
             let text = "";
+
+            //1) get text from article
+            let stepOneText = "";
+            if( $("article p").text().length > 700 )
+              stepOneText = $("article p").text();
+            else if( $("article div").text().length > 700)
+              stepOneText = $("article div").text();
+
+            //2) if step 1 doesn't work, extract text elements based on common class names for those elements
+            let stepTwoText = "";
+            let elementsByClass = document.querySelectorAll("p[class*='aragraph'], p[class*='ext'], div[class*='aragraph'], div[class*='ext']")
+            for(let i = 0; i < elementsByClass.length; i++) {
+              if(elementsByClass[i].textContent.length > 280){
+                stepTwoText = stepTwoText.concat(elementsByClass[i].textContent.trim(), " ")
+              }
+            }
+
+            //3) if step 2 doesn't work, extract all the contents from the body with more than 700 words
+            let stepThreeText = "";
             let childNodes = $('body').contents()
             for(let el in childNodes){
               if(childNodes[el] && !isNaN(el)){
-                if(childNodes[el].textContent && childNodes[el].textContent.length > 140){
-                    text = text.concat(childNodes[el].textContent.trim(), " ");
+                if(childNodes[el].textContent && childNodes[el].textContent.split(" ").length > 100){
+                  stepThreeText = stepThreeText.concat(childNodes[el].textContent.trim(), " ");
                 }
                 if(childNodes[el].childNodes && childNodes[el].childNodes.length > 0)
                   childNodes = [...childNodes, ...childNodes[el].childNodes]
               }
             }
+
+            //check which extraction was better
+            //TODO to caindo de sono agora
 
             //removing line breaks, json and html tags
             return text
