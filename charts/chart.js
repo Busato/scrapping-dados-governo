@@ -74,8 +74,8 @@ function renderChartPerCategorySentiment (result) {
     let colors = getRandomColors (newsResult.length);
 
     let resultCategoria = getDataFromResultSentiment("date", 
-    getOnlyNewsFromCategory(newsResult, 'saude'));
-    console.log(resultCategoria)
+    getOnlyNewsFromCategory(newsResult, 'saúde'));
+
     var ctx = document.getElementById("myChartDateSaude").getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
@@ -83,7 +83,7 @@ function renderChartPerCategorySentiment (result) {
             labels: resultCategoria.map(({ date }) => date),
             datasets: [
               {
-                label: 'Sentimento para categoria saude por tempo',
+                label: 'Sentimento para categoria saúde por tempo',
                 fill: false,
                 data: resultCategoria.map(({ sentiment }) => sentiment),
                 borderColor: colors[0],
@@ -124,23 +124,50 @@ function renderChartPerCategorySentiment (result) {
     });
   }
 
-  function renderChartPartidosLessSentimentCultura (result) {
+  function renderChartPartidosLessSentimentSegurança (result) {
     let newsResult = result
 
-    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'cultura');
+    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'segurança');
 
     let arrayResults = findWordThatMostAppearsInString(resultCategoria, arrayPartidosPoliticos)
 
     let colors = getRandomColors (arrayResults.length);
 
-    var ctx = document.getElementById("myChartChartPartidosLessSentimentCultura").getContext('2d');
+    var ctx = document.getElementById("myChartChartPartidosLessSentimentSegurança").getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: arrayResults.map(({name}) => name),
             datasets: [
               {
-                label: 'Sentimento relacionados a cultura para partidos',
+                label: 'Sentimento relacionados a segurança para partidos',
+                fill: false,
+                data: arrayResults.map(({sentiment}) => sentiment),
+                borderColor: colors,
+                backgroundColor: colors,
+                responsive: true,
+                maintainAspectRatio: false,
+              },
+          ]
+        },
+    });
+  }
+
+  function renderChartSentimentPerMinistros (result) {
+    let newsResult = result
+
+    let arrayResults = findSentenceThatMostAppearsInString(newsResult, arrayMinistros)
+    console.log(arrayResults);
+    let colors = getRandomColors (arrayResults.length);
+
+    var ctx = document.getElementById("myChartSentimentPerMinistros").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: arrayResults.map(({name}) => name),
+            datasets: [
+              {
+                label: 'Sentimento de ministros',
                 fill: false,
                 data: arrayResults.map(({sentiment}) => sentiment),
                 borderColor: colors,

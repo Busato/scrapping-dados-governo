@@ -87,12 +87,12 @@ module.exports = {
     },
 
     removeStopWords: text => {
+        let textFiltered = text
         for(let word of stopwords) {
-            let regexp = new RegExp("\\b"+word.trim()+"\\b", "g")
-            if(text.match(regexp))
-                text = text.replace(regexp, "")
+            let regexp = new RegExp(`\\s${word.trim()}\\s`, "gi")
+            if(textFiltered.match(regexp))
+                textFiltered = textFiltered.replace(regexp, " ")
         }
-
-        return text;
+        return textFiltered;
     }
 }

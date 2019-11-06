@@ -4,14 +4,14 @@ const fs = require('fs');
 
 const urlsToCrawl = [
     {url: `https://noticias.uol.com.br/`},
-   {url: `https://g1.globo.com/`},
-   {url: `https://www.nsctotal.com.br`},
+    {url: `https://g1.globo.com/`},
+    {url: `https://www.nsctotal.com.br`},
     {url: `https://www.folha.uol.com.br/`},
     {url: `https://gauchazh.clicrbs.com.br`},
     {url: `https://www.em.com.br/`},
     {url: `https://www.tribunapr.com.br/`},
     {url: `https://www.diariodepernambuco.com.br/`},
-    ]
+]
  
 const arrayOfNews = {
     news: []
@@ -24,7 +24,7 @@ module.exports = {
         const browser = await puppeteer.launch()
 
         //Open file
-        fs.writeFileSync('news.json','[\n', { flag: 'a'});
+        fs.writeFileSync(__dirname + '/../news.json','[\n', { flag: 'a'});
 
         console.log(`--------------------------- \n`)
         console.log(`Beginning Scrapper \n`)
@@ -38,7 +38,7 @@ module.exports = {
         }
 
         //Close file
-        fs.writeFileSync('news.json',']', { flag: 'a'});
+        fs.writeFileSync(__dirname + '/../news.json',']', { flag: 'a'});
 
         console.log(`Ending Scrapper \n`)
         console.log(`--------------------------- \n`)
