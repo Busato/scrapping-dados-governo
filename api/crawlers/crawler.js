@@ -53,7 +53,7 @@ const Crawl = module.exports = {
             for(let selector of ['script', 'noscript', 'style',
                 'img', 'iframe', 'header', 'li', 'ul', 'button',
                 'svg', 'meta', 'audima-div', 'figure', 'footer',
-                'aside'])
+                'aside', 'form'])
               document.querySelectorAll(selector).forEach(el => el.outerHTML = "");
 
             //add jQuery
@@ -63,15 +63,15 @@ const Crawl = module.exports = {
             $("body").append(s);
 
             //extract text
-            let text = $("article p").text() || $("article p").innerText || "";
-            if(text && text.length > 140)
-              return text;
+            if($("article p").text() > 700)
+              return $("article p").text();
 
+            let text = "";
             let childNodes = $('body').contents()
             for(let el in childNodes){
               if(childNodes[el] && !isNaN(el)){
                 if(childNodes[el].textContent && childNodes[el].textContent.length > 140){
-                    text = text.concat(childNodes[el].textContent, " ");
+                    text = text.concat(childNodes[el].textContent.trim(), " ");
                 }
                 if(childNodes[el].childNodes && childNodes[el].childNodes.length > 0)
                   childNodes = [...childNodes, ...childNodes[el].childNodes]
