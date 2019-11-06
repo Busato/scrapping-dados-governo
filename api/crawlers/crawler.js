@@ -50,7 +50,7 @@ const Crawl = module.exports = {
           currentNews.title = page.title
           currentNews.text = await newPage.evaluate(() => {
             //cleaning page
-            for(let selector of ['noscript', 'style',
+            for(let selector of ['script','noscript', 'style',
                 'img', 'iframe', 'header', 'li', 'ul', 'button',
                 'svg', 'meta', 'audima-div', 'figure', 'footer',
                 'aside', 'form'])
@@ -67,8 +67,10 @@ const Crawl = module.exports = {
 
             //1) get text from article
             let stepOneText = "";
+            //article p is always good, so just return it
             if( $("article p").text().length > 700 )
-              stepOneText = $("article p").text();
+              return $("article p").text();
+            //article div may not be good, so we gotta test it
             else if( $("article div").text().length > 700)
               stepOneText = $("article div").text();
 
@@ -95,7 +97,16 @@ const Crawl = module.exports = {
             }
 
             //check which extraction was better
-            //TODO to caindo de sono agora
+            //TODO word count, if text has <> or {}, pr [], [cadastre-se, assine, acesse, encontre, assinantes], upper case words joinend, words longer than 30 chars (can be joined words)
+            let wordcount1 = stepOneText.split(" ").length;
+            let wordcount2 = stepTwoText.split(" ").length;
+            let wordcount3 = stepThreeText.split(" ").length;
+            if(wordcount1 > wordcount2 && wordcount1 > wordcount3)
+              text = stepOneText
+            if(wordcount2 > wordcount1 && wordcount2 > wordcount3)
+              text = stepTwoText
+            if(wordcount3 > wordcount2 && wordcount3 > wordcount1)
+              text = stepThreeText
 
             //removing line breaks, json and html tags
             return text
