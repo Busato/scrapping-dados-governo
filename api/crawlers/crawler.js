@@ -6,7 +6,7 @@ const sentiment = require('sentiment-ptbr');
 const crawledPages = new Map()
 const arrayOfNews = []
 
-const MAXDEPTH = 1
+const MAXDEPTH = 2
 
 const Crawl = module.exports = {
     crawl: async (browser, page, depth = 0) => {
@@ -132,9 +132,9 @@ const Crawl = module.exports = {
             ? utils.getCategoryFromText(currentNews.text) : ''
 
           //fsextra.writeJsonSync('news.json', currentNews, { flag: 'a'});
-          fs.writeFileSync(__dirname + '/../news.json', JSON.stringify(currentNews) +',\n', { flag: 'a'});
+          // fs.writeFileSync(__dirname + '/../news.json', JSON.stringify(currentNews) +',\n', { flag: 'a'});
           // Write news to file
-          //utils.appendNewsToJson(currentNews);
+          utils.appendNewsToJson(currentNews);
 
           // Push to news array
           arrayOfNews.push(currentNews)

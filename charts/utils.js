@@ -89,11 +89,11 @@ const sortByDate = (result) => {
     return result.sort(function(a,b) {
       var partesDataA = a.date.split("/");
       var dataA = new Date(partesDataA[2], partesDataA[1] - 1, partesDataA[0]);
-      
+
       var partesDataB = b.date.split("/");
       var dataB = new Date(partesDataB[2], partesDataB[1] - 1, partesDataB[0]);
 
-      return dataA - dataB;
+      return dataB - dataA;
     });
 }
 
@@ -139,10 +139,8 @@ const findSentenceThatMostAppearsInString = (arrayResults, arrayOfWords) => {
     if (!result.text || result.text === '') return
 
     arrayOfWords.forEach(wordToMatch => {
-      console.log(wordToMatch)
       let regexp = new RegExp(wordToMatch, "g")
       let arrayString = result.text.match(regexp);
-      console.log(arrayString)
         if (arrayString && arrayString.length > 0) {
           let attributeFound = wordCounts.find((element)=>{
             return element && element.name === wordToMatch
@@ -171,6 +169,27 @@ const clickHandler = function(e) {
     $('.btn').css('display', 'none');
     $('.spinner-border').css('display', '');
       $.ajax({
+        url: "http://localhost:3000/analize",
+        type: 'GET',
+        contentType: "application/json",
+        dataType: 'json',
+        crossDomain: true,
+        success: function(result){
+          $('.spinner-border').css('display', 'none');
+        },
+        error: function (req, status, error) {
+          alert(error)
+          $('#failure-message').css('display', '');
+          console.log(error)
+        }
+    })
+  }
+
+  $('.btn').one('click', clickHandler);
+
+  const clickHandlerGraph = function(e) {
+    e.preventDefault()
+      $.ajax({
         url: "http://localhost:3000/news",
         type: 'GET',
         contentType: "application/json",
@@ -194,4 +213,5 @@ const clickHandler = function(e) {
     })
   }
 
-  $('.btn').one('click', clickHandler);
+  $('.btn-graph').one('click', clickHandlerGraph);
+

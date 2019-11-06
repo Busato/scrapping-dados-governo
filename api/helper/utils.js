@@ -52,14 +52,14 @@ module.exports = {
     },
 
     appendNewsToJson: arrayOfNews => {
-        fs.readFile('news.json', function (err, data) {
+        fs.readFile(__dirname + '/../news.json', function (err, data) {
             let json = []
             if (data && data.length > 0) {
                 json = JSON.parse(data)
                 json.push(arrayOfNews)
             }
             
-            fs.writeFile('news.json', JSON.stringify(json, null, 2), (err) => {
+            fs.writeFile(__dirname + '/../news.json', JSON.stringify(json, null, 2), (err) => {
                 if (err) console.error(err)
                 console.log('News data written to file \n')
             })

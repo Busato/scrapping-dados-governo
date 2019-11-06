@@ -23,7 +23,7 @@ module.exports = {
         const browser = await puppeteer.launch()
 
         //Open file
-        fs.writeFileSync(__dirname + '/../news.json','[\n', { flag: 'a'});
+        // fs.writeFileSync(__dirname + '/../news.json','[\n', { flag: 'a'});
 
         console.log(`--------------------------- \n`)
         console.log(`Beginning Scrapper \n`)
@@ -37,7 +37,7 @@ module.exports = {
         }
 
         //Close file
-        fs.writeFileSync(__dirname + '/../news.json',']', { flag: 'a'});
+        // fs.writeFileSync(__dirname + '/../news.json',']', { flag: 'a'});
 
         console.log(`Ending Scrapper \n`)
         console.log(`--------------------------- \n`)
