@@ -61,7 +61,7 @@ module.exports = {
             
             fs.writeFile(__dirname + '/../news.json', JSON.stringify(json, null, 2), (err) => {
                 if (err) console.error(err)
-                console.log('News data written to file \n')
+                //console.log('News data written to file \n')
             })
         })        
     },
@@ -96,16 +96,35 @@ module.exports = {
         return textFiltered;
     },
 
-    doNotCrawl: (url) => {
-        [
+    allowCrawl: (url) => {
+        let forbidden = [
             'facebook.com',
             'twitter.com',
             'instagram.com',
-            'linkedin.com'
-        ].forEach(value => {
-            if(url.includes(value))
-                return true;
-        });
-        return false;
+            'linkedin.com',
+            'plus.google.com',
+            'pinterest',
+            'api.whatsapp',
+            'web.whatsapp',
+            'whatsapp:',
+            'mailto',
+            'checkout',
+            'server',
+            'acesse',
+            'assine',
+            'assinante',
+            'cadastre',
+            'login',
+            'logout',
+            'paywall',
+            'send?text'
+        ];
+
+        for (let dont of forbidden) {
+            let reg = new RegExp(dont);
+            if(reg.test(url))
+                return false;
+        }
+        return true;
     }
 }
