@@ -6,7 +6,7 @@ const sentiment = require('sentiment-ptbr');
 const crawledPages = new Map()
 const arrayOfNews = []
 
-const MAXDEPTH = 1
+const MAXDEPTH = 0
 
 const Crawl = module.exports = {
     crawl: async (browser, page, writeStream, depth = 0) => {
@@ -30,6 +30,9 @@ const Crawl = module.exports = {
                 const newPage = await browser.newPage()
                 await newPage.goto(page.url, {waitUntil: 'networkidle2', timeout: 0})
                 await newPage.setViewport({width: 320, height: 600})
+
+                //check if jQuery already exists
+                //todo verifiar se o jquery existe no site, caso exista, pode haver problemas pra adicionar a tag
                 await newPage.addScriptTag({url: 'https://code.jquery.com/jquery-3.2.1.min.js'})
 
                 // Get all the children pages and filter them
@@ -172,13 +175,11 @@ const Crawl = module.exports = {
         }
 
         // Crawl subpages.
-        let promises = []
         if(page.children){
             for (const childPage of page.children) {
-                promises.push(Crawl.crawl(browser, childPage, writeStream, depth + 1))
+                await Crawl.crawl(browser, childPage, writeStream, depth + 1)
             }
         }
-        await Promise.all(promises)
         return arrayOfNews
     }
 }
