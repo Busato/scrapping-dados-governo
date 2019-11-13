@@ -4,9 +4,9 @@ const fs = require('fs');
 
 const urlsToCrawl = [
    {url: `https://noticias.uol.com.br/`},
-    // {url: `https://g1.globo.com/`},
-    //  {url: `https://www.nsctotal.com.br`},
-    // {url: `https://gauchazh.clicrbs.com.br`},
+     //{url: `https://g1.globo.com/`},
+    //{url: `https://www.nsctotal.com.br`},
+    //{url: `https://gauchazh.clicrbs.com.br`},
      //{url: `https://www.em.com.br/`},
     //{url: `https://www.tribunapr.com.br/`},
      //{url: `https://www.diariodepernambuco.com.br/`},
@@ -18,7 +18,7 @@ const arrayOfNews = {
 }
 
 module.exports = {
-    initiateCrawling: async () => {
+    initiateCrawling: async (writeStream) => {
 
         // Initiate Browser 
         const browser = await puppeteer.launch()
@@ -32,7 +32,7 @@ module.exports = {
         for (const currentUrl of urlsToCrawl) {
             console.log(`Begin Crawler ${currentUrl.url} \n`)
             //let currentArrayOfNews = await crawler.crawl(browser, {url: `${currentUrl.url}`})
-            promises.push(crawler.crawl(browser, {url: `${currentUrl.url}`})
+            promises.push(crawler.crawl(browser, {url: `${currentUrl.url}`}, writeStream)
                 .then(value => console.log(`Ending Crawler ${currentUrl.url} \n`))
             );
         }

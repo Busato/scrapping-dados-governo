@@ -6,10 +6,10 @@ const sentiment = require('sentiment-ptbr');
 const crawledPages = new Map()
 const arrayOfNews = []
 
-const MAXDEPTH = 10
+const MAXDEPTH = 1
 
 const Crawl = module.exports = {
-    crawl: async (browser, page, depth = 0) => {
+    crawl: async (browser, page, writeStream, depth = 0) => {
   
         // Verify subpage depth
         if (depth > MAXDEPTH) {
@@ -47,8 +47,31 @@ const Crawl = module.exports = {
                 // Get data from current page news
                 let currentNews = {}
 
-                currentNews.url = page.url
-                currentNews.title = page.title
+                currentNews.url = page.url;
+                currentNews.title = page.title;
+
+                currentNews.date = await newPage.evaluate((utils) => {
+                  let html_date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  let body_date = $("body").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  let article_date = $("article").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+                  //check most valid date
+                  let dates = [html_date, body_date, article_date].filter(date => {
+                    if(date && date.length > 0)
+                      return date
+                  });
+
+                  let from = new Date("1/1/2019");
+                  let to = new Date((new Date()).setHours(0,0,0))
+
+                  //find the first date that matches the date range between the beginning of the government and now
+                  for(let date of dates) {
+                    let current_date = new Date(`${date[2]}/${date[1]}/${date[3]}`)
+                    if(current_date >= from && current_date <= to)
+                      return date[0]
+                  }
+                  return ""
+                });
+
                 currentNews.text = await newPage.evaluate(() => {
                     //cleaning page
                     for(let selector of ['script','noscript', 'style',
@@ -121,11 +144,6 @@ const Crawl = module.exports = {
 
                 currentNews.text = utils.removeStopWords(currentNews.text)
 
-                currentNews.date = await newPage.evaluate((utils) => {
-                    let date = $("html").text().match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-                    return date && date.length > 0 ? date[0] : ''
-                });
-
                 // Sentiment analysis using sentiment-ptbr lib
                 // If text wasnt retrieved, score is 0
                 currentNews.sentiment = currentNews.text ? sentiment(currentNews.text).score : 0;
@@ -135,7 +153,8 @@ const Crawl = module.exports = {
                 //fsextra.writeJsonSync('news.json', currentNews, { flag: 'a'});
                 // fs.writeFileSync(__dirname + '/../news.json', JSON.stringify(currentNews) +',\n', { flag: 'a'});
                 // Write news to file
-                await utils.appendNewsToJson(currentNews);
+                writeStream.write(JSON.stringify(currentNews) + ',\n');
+                //await utils.appendNewsToJson(currentNews);
 
                 // Push to news array
                 arrayOfNews.push(currentNews);
@@ -156,7 +175,7 @@ const Crawl = module.exports = {
         let promises = []
         if(page.children){
             for (const childPage of page.children) {
-                promises.push(Crawl.crawl(browser, childPage, depth + 1))
+                promises.push(Crawl.crawl(browser, childPage, writeStream, depth + 1))
             }
         }
         await Promise.all(promises)
