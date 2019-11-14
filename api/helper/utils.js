@@ -118,7 +118,8 @@ module.exports = {
             'logout',
             'paywall',
             'send?text',
-            'fb-messenger'
+            'fb-messenger',
+            'tools'
         ];
 
         for (let dont of forbidden) {

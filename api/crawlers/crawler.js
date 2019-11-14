@@ -2,11 +2,11 @@ const utils = require("../helper/utils.js")
 const fs = require('fs')
 const fsextra = require('fs-extra')
 const sentiment = require('sentiment-ptbr');
-;
+
 const crawledPages = new Map()
 const arrayOfNews = []
 
-const MAXDEPTH = 0
+const MAXDEPTH = 1
 
 const Crawl = module.exports = {
     crawl: async (browser, page, writeStream, depth = 0) => {
@@ -75,75 +75,7 @@ const Crawl = module.exports = {
                   return ""
                 });
 
-                currentNews.text = await newPage.evaluate(() => {
-                    //cleaning page
-                    for(let selector of ['script','noscript', 'style',
-                        'img', 'iframe', 'header', 'li', 'ul', 'button',
-                        'svg', 'meta', 'audima-div', 'figure', 'footer',
-                        'aside', 'form'])
-                        document.querySelectorAll(selector).forEach(el => el.outerHTML = "");
-
-                    //add jQuery
-                    var s = document.createElement("script");
-                    s.type = "text/javascript";
-                    s.src = "https://code.jquery.com/jquery-3.2.1.min.js";
-                    $("body").append(s);
-
-                    //extract text
-                    let text = "";
-
-                    //1) get text from article
-                    let stepOneText = "";
-                    //article p is always good, so just return it
-                    if( $("article p").text().length > 700 )
-                        return $("article p").text();
-                    //article div may not be good, so we gotta test it
-                    else if( $("article div").text().length > 700)
-                        stepOneText = $("article div").text();
-
-                    //2) if step 1 doesn't work, extract text elements based on common class names for those elements
-                    let stepTwoText = "";
-                    let elementsByClass = document.querySelectorAll("p[class*='aragraph'], p[class*='ext'], div[class*='aragraph'], div[class*='ext']")
-                    for(let i = 0; i < elementsByClass.length; i++) {
-                        if(elementsByClass[i].textContent.length > 280){
-                            stepTwoText = stepTwoText.concat(elementsByClass[i].textContent.trim(), " ")
-                        }
-                    }
-
-                    //3) if step 2 doesn't work, extract all the contents from the body with more than 700 words
-                    let stepThreeText = "";
-                    let childNodes = $('body').contents()
-                    for(let el in childNodes){
-                        if(childNodes[el] && !isNaN(el)){
-                            if(childNodes[el].textContent && childNodes[el].textContent.split(" ").length > 100){
-                                stepThreeText = stepThreeText.concat(childNodes[el].textContent.trim(), " ");
-                            }
-                            if(childNodes[el].childNodes && childNodes[el].childNodes.length > 0)
-                                childNodes = [...childNodes, ...childNodes[el].childNodes]
-                        }
-                    }
-
-                    //check which extraction was better
-                    //TODO word count, if text has <> or {}, pr [], [cadastre-se, assine, acesse, encontre, assinantes], upper case words joinend, words longer than 30 chars (can be joined words)
-                    let wordcount1 = stepOneText.split(" ").length;
-                    let wordcount2 = stepTwoText.split(" ").length;
-                    let wordcount3 = stepThreeText.split(" ").length;
-                    if(wordcount1 > wordcount2 && wordcount1 > wordcount3)
-                        text = stepOneText
-                    if(wordcount2 > wordcount1 && wordcount2 > wordcount3)
-                        text = stepTwoText
-                    if(wordcount3 > wordcount2 && wordcount3 > wordcount1)
-                        text = stepThreeText
-
-                    //removing line breaks, json and html tags
-                    return text
-                        .replace(/\s\s+/g, " ")
-                        .replace(/(\[.*?\])/g, "")
-                        .replace(/(\{.*?\})/g, "")
-                        .replace(/<\/?[^>]+(>|$)/g, "")
-                        .replace(/\r?\n|\r/g, " ")
-                        .replace(/<[^>]+>/g, "");
-                })
+                currentNews.text = await newPage.evaluate(extractTextFromPage);
 
                 currentNews.text = utils.removeStopWords(currentNews.text)
 
@@ -212,3 +144,99 @@ collectAllSameOriginAnchorsDeep = (sameOrigin = false) => {
       
     return Array.from(new Set(filtered))
 };
+
+extractTextFromPage = () => {
+    //if page has an unbreakable paywall, then don't extract content
+    let title_words = document.querySelector('title').text.split(" ");
+    let paywall_words = ["assin", "exclusiv", "login", "logado", 'cadastr']
+    let paywall_elemetns = document.querySelectorAll("div[class*='paywall']")
+
+    for(let value of paywall_elemetns){
+        let text = value.textContent.trim();
+
+        let numberWords = 0;
+        for(let word of paywall_words) {
+            let regex = new RegExp(word, 'g');
+            if(text.match(regex))
+                numberWords++
+        }
+
+        let matchesWithTitle = 0;
+        for(let word of title_words) {
+            let regex = new RegExp(word, 'g');
+            if(text.match(regex))
+                matchesWithTitle += text.match(regex).length
+        }
+
+        if(numberWords > 0 && matchesWithTitle < title_words.length)
+            return "Another Brick in The (Pay)Wall"
+    }
+
+    //cleaning page
+    for(let selector of ['script','noscript', 'style',
+        'img', 'iframe', 'header', 'li', 'ul', 'button',
+        'svg', 'meta', 'audima-div', 'figure', 'footer',
+        'aside', 'form'])
+        document.querySelectorAll(selector).forEach(el => el.outerHTML = "");
+
+    //add jQuery
+    var s = document.createElement("script");
+    s.type = "text/javascript";
+    s.src = "https://code.jquery.com/jquery-3.2.1.min.js";
+    $("body").append(s);
+
+    //extract text
+    let text = "";
+
+    //1) get text from article
+    let stepOneText = "";
+    //article p is always good, so just return it
+    if( $("article p").text().length > 700 )
+        return $("article p").text();
+    //article div may not be good, so we gotta test it
+    else if( $("article div").text().length > 700)
+        stepOneText = $("article div").text();
+
+    //2) if step 1 doesn't work, extract text elements based on common class names for those elements
+    let stepTwoText = "";
+    let elementsByClass = document.querySelectorAll("p[class*='aragraph'], p[class*='ext'], div[class*='aragraph'], div[class*='ext']")
+    for(let i = 0; i < elementsByClass.length; i++) {
+        if(elementsByClass[i].textContent.length > 280){
+            stepTwoText = stepTwoText.concat(elementsByClass[i].textContent.trim(), " ")
+        }
+    }
+
+    //3) if step 2 doesn't work, extract all the contents from the body with more than 700 words
+    let stepThreeText = "";
+    let childNodes = $('body').contents()
+    for(let el in childNodes){
+        if(childNodes[el] && !isNaN(el)){
+            if(childNodes[el].textContent && childNodes[el].textContent.split(" ").length > 100){
+                stepThreeText = stepThreeText.concat(childNodes[el].textContent.trim(), " ");
+            }
+            if(childNodes[el].childNodes && childNodes[el].childNodes.length > 0)
+                childNodes = [...childNodes, ...childNodes[el].childNodes]
+        }
+    }
+
+    //check which extraction was better
+    //TODO word count, if text has <> or {}, pr [], [cadastre-se, assine, acesse, encontre, assinantes], upper case words joinend, words longer than 30 chars (can be joined words)
+    let wordcount1 = stepOneText.split(" ").length;
+    let wordcount2 = stepTwoText.split(" ").length;
+    let wordcount3 = stepThreeText.split(" ").length;
+    if(wordcount1 > wordcount2 && wordcount1 > wordcount3)
+        text = stepOneText
+    if(wordcount2 > wordcount1 && wordcount2 > wordcount3)
+        text = stepTwoText
+    if(wordcount3 > wordcount2 && wordcount3 > wordcount1)
+        text = stepThreeText
+
+    //removing line breaks, json and html tags
+    return text
+        .replace(/\s\s+/g, " ")
+        .replace(/(\[.*?\])/g, "")
+        .replace(/(\{.*?\})/g, "")
+        .replace(/<\/?[^>]+(>|$)/g, "")
+        .replace(/\r?\n|\r/g, " ")
+        .replace(/<[^>]+>/g, "");
+}
