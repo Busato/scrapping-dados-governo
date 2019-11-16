@@ -6,7 +6,7 @@ const sentiment = require('sentiment-ptbr');
 const crawledPages = new Map()
 const arrayOfNews = []
 
-const MAXDEPTH = 1
+const MAXDEPTH = 5;
 
 const Crawl = module.exports = {
     crawl: async (browser, page, writeStream, depth = 0) => {
@@ -75,6 +75,13 @@ const Crawl = module.exports = {
                   return ""
                 });
 
+                currentNews.formatedDate = function() {
+                    if(currentNews.date){
+                        let date = currentNews.date.split('/')
+                        return new Date(`${date[1]}/${date[0]}/${date[2]}`)
+                    }
+                }();
+
                 currentNews.text = await newPage.evaluate(extractTextFromPage);
 
                 currentNews.text = utils.removeStopWords(currentNews.text)
@@ -83,12 +90,13 @@ const Crawl = module.exports = {
                 // If text wasnt retrieved, score is 0
                 currentNews.sentiment = currentNews.text ? sentiment(currentNews.text).score : 0;
                 currentNews.category = utils.getCategoryFromText(currentNews.text)
-                    ? utils.getCategoryFromText(currentNews.text) : ''
+                    //? utils.getCategoryFromText(currentNews.text) : ''
 
                 //fsextra.writeJsonSync('news.json', currentNews, { flag: 'a'});
                 // fs.writeFileSync(__dirname + '/../news.json', JSON.stringify(currentNews) +',\n', { flag: 'a'});
                 // Write news to file
-                writeStream.write(JSON.stringify(currentNews) + ',\n');
+                if(currentNews.text !== "Another Brick in The (Pay)Wall")
+                    writeStream.write(JSON.stringify(currentNews) + ',\n');
                 //await utils.appendNewsToJson(currentNews);
 
                 // Push to news array
@@ -148,7 +156,7 @@ collectAllSameOriginAnchorsDeep = (sameOrigin = false) => {
 extractTextFromPage = () => {
     //if page has an unbreakable paywall, then don't extract content
     let title_words = document.querySelector('title').text.split(" ");
-    let paywall_words = ["assin", "exclusiv", "login", "logado", 'cadastr']
+    let paywall_words = ["Assine", "assine", "xclusiv", "ogin", "ogado", 'adastr']
     let paywall_elemetns = document.querySelectorAll("div[class*='paywall']")
 
     for(let value of paywall_elemetns){
@@ -221,6 +229,8 @@ extractTextFromPage = () => {
 
     //check which extraction was better
     //TODO word count, if text has <> or {}, pr [], [cadastre-se, assine, acesse, encontre, assinantes], upper case words joinend, words longer than 30 chars (can be joined words)
+
+    //#1 check paywall words
     let wordcount1 = stepOneText.split(" ").length;
     let wordcount2 = stepTwoText.split(" ").length;
     let wordcount3 = stepThreeText.split(" ").length;

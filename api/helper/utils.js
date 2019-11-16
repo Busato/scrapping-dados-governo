@@ -21,17 +21,31 @@ const arrayFilteredWords =
     'judiciario',
 ]
 
-const arrayCategoriesFilteredWords = 
-[ 
-    'educação',
-    'saúde',
-    'segurança',
-    'economia',
-    'cultura',
-    'justiça',
-    'trabalho',
-    'meio ambiente',
-]
+const dictionary = {
+    edu: 'Educação',
+    sau: "Saúde",
+    seg: 'Segurança',
+    eco: 'Economia',
+    cul: 'Cultura',
+    tur: 'Turismo',
+    jus: 'Política e Justiça',
+    tra: 'Trabalho',
+    amb: 'Meio Ambiente',
+    ext: 'Relações Exteriores'
+}
+
+const categories = {
+    edu: ['educação', 'estudos',"univerisade", "escola", "Weintraub", "MEC", "vestibular", "ENEM", "pesquisa", "pesquisador", 'estudante', 'professor', 'Ministério da Educação'],
+    sau: ['saúde', 'SUS', 'Sistema Único de Saúde','medico', 'médicos', 'hospital', 'hospitais', 'clima', 'climática', 'tratamento','Mandetta', 'Ministério da Saúde'],
+    seg: ['Segurança', 'segurança', 'polícia', 'militar', 'Polícia Civil', 'Polícia Federal', 'Polícia Militar'],
+    eco: ['Economia', 'economia', 'dólar', 'inflação','Guedes', 'investimento', 'investir', 'investidor', 'empreendimento', 'empreender', 'empreendedor', 'empresa', 'imposto'],
+    cul: ['Cultura', 'cultura', 'Secretaria de Cultura', 'Ancine'],
+    tur: ['Turismo', 'turismo', 'Ministério do Turismo'],
+    jus: ['Justiça', 'justiça', 'STF', 'STJ', 'Moro', 'judiciário', 'Judiciário', 'CCJ', 'Lava Jato'],
+    tra: ['trabalho', 'funcionario', 'aposentadoria', 'empresa', 'emprego','Previdência', 'FGTS', 'CLT', 'desemprego', 'trabalho informal', 'licença-maternidade', 'seguro desemprego', 'salário', 'carteira assinada'],
+    amb: ['Meio Ambiente', 'Agricultura', 'Amazônia','Ibama','aquecimento global', 'Aquecimento Global', 'climáticas', 'óleo', 'Salles', 'Ministério do Meio Ambiente', 'MMA'],
+    ext: ['Relações Exteriores', 'América do Sul','Mercosul', 'Bolívia', 'Chile', 'Argentina', 'Uruguai', 'México', 'Equador','Venezuela', 'EUA', 'Estados Unidos', 'Europa', 'China','Ernesto Araújo', 'embaixada', 'diplomata', 'diplomacia']
+}
 
 const stopwords = (fs.readFileSync('stopwords.txt')).toString().split('\n');
 
@@ -51,39 +65,28 @@ module.exports = {
         return arraLinksFiltered
     },
 
-    appendNewsToJson: arrayOfNews => {
-        fs.readFile(__dirname + '/../news.json', function (err, data) {
-            let json = []
-            if (data && data.length > 0) {
-                json = JSON.parse(data)
-                json.push(arrayOfNews)
-            }
-            
-            fs.writeFile(__dirname + '/../news.json', JSON.stringify(json, null, 2), (err) => {
-                if (err) console.error(err)
-                //console.log('News data written to file \n')
-            })
-        })        
-    },
-
     writeSiteLog: url => {
         fs.appendFile('site-log.txt', `Visited: ${url} \n`, (err) => {
           if (err) console.error(err)
         })
     },
-    
+
     getCategoryFromText: text => {
-        let arrayCategories = []
-        arrayCategoriesFilteredWords.forEach(category => {
-            let count = (text.match(new RegExp(`\\b${category}\\b`, "g")) || []).length;
-            arrayCategories.push({ category, count})
+    let arrayCategories = [];
+    for(let c in categories) {
+        let category = categories[c];
+        let count = 0;
+        category.forEach(word => {
+            count += (text.match(new RegExp(word, "g")) || []).length;
         });
+        arrayCategories.push({ category: dictionary[c], count})
+    }
 
-        let res = Math.max.apply(Math, arrayCategories.map((element) => { return element.count; }))
+    let res = Math.max.apply(Math, arrayCategories.map((element) => { return element.count; }))
 
-        let obj = arrayCategories.find(function(o){ return o.count == res; })
+    let obj = arrayCategories.find(function(o){ return o.count == res; })
 
-        return (obj.count !== 0) ? obj.category : "sem categoria" 
+    return (obj.count !== 0) ? obj.category : "Sem categoria"
     },
 
     removeStopWords: text => {

@@ -86,16 +86,8 @@ const getRandomColors = (howManyColors) => {
 }
 
 const sortByDate = (result) => {  
-    return result.sort(function(a,b) {
-      var partesDataA = a.date.split("/");
-      var dataA = new Date(partesDataA[2], partesDataA[1] - 1, partesDataA[0]);
-
-      var partesDataB = b.date.split("/");
-      var dataB = new Date(partesDataB[2], partesDataB[1] - 1, partesDataB[0]);
-
-      return dataB - dataA;
-    });
-}
+    return result.sort((a,b) => new Date(a.formatedDate) - new Date(b.formatedDate));
+};
 
 const findWordThatMostAppearsInString = (arrayResults, arrayOfWords) => {
   let wordCounts = []
