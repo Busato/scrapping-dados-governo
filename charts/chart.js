@@ -47,8 +47,8 @@ function renderChartPerCategorySentiment (result) {
     newsResult = sortByDate(newsResult)
     let colors = getRandomColors (newsResult.length);
 
-    let resultCategoria = getDataFromResultSentiment("date", 
-    getOnlyNewsFromCategory(newsResult, 'trabalho'));
+    let resultCategoria = getDataFromResultSentiment("formatedDate",
+    getOnlyNewsFromCategory(newsResult, 'Trabalho'));
     var ctx = document.getElementById("myChartDateTrabalho").getContext('2d');
     var myChart = new Chart(ctx, {
         type: 'line',
@@ -71,10 +71,11 @@ function renderChartPerCategorySentiment (result) {
   function renderChartSentimentPerDateSaude (result) {
     let newsResult = result
     newsResult = sortByDate(newsResult)
+    console.log(newsResult);
     let colors = getRandomColors (newsResult.length);
 
-    let resultCategoria = getDataFromResultSentiment("date", 
-    getOnlyNewsFromCategory(newsResult, 'saúde'));
+    let resultCategoria = getDataFromResultSentiment("formatedDate",
+    getOnlyNewsFromCategory(newsResult, 'Saúde'));
 
     var ctx = document.getElementById("myChartDateSaude").getContext('2d');
     var myChart = new Chart(ctx, {
@@ -98,7 +99,7 @@ function renderChartPerCategorySentiment (result) {
   function renderChartPartidosLessSentimentEconomia (result) {
     let newsResult = result
 
-    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'economia');
+    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'Economia');
 
     let arrayResults = findWordThatMostAppearsInString(resultCategoria, arrayPartidosPoliticos)
 
@@ -127,7 +128,7 @@ function renderChartPerCategorySentiment (result) {
   function renderChartPartidosLessSentimentSegurança (result) {
     let newsResult = result
 
-    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'segurança');
+    let resultCategoria = getOnlyNewsFromCategory(newsResult, 'Segurança');
 
     let arrayResults = findWordThatMostAppearsInString(resultCategoria, arrayPartidosPoliticos)
 

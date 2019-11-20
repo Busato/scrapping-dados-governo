@@ -86,7 +86,7 @@ const getRandomColors = (howManyColors) => {
 }
 
 const sortByDate = (result) => {  
-    return result.sort((a,b) => new Date(a.formatedDate) - new Date(b.formatedDate));
+    return result.filter(date => date.formatedDate).sort((a,b) => new Date(a.formatedDate) - new Date(b.formatedDate));
 };
 
 const findWordThatMostAppearsInString = (arrayResults, arrayOfWords) => {

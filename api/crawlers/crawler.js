@@ -6,7 +6,7 @@ const sentiment = require('sentiment-ptbr');
 const crawledPages = new Map()
 const arrayOfNews = []
 
-const MAXDEPTH = 5;
+const MAXDEPTH = 10;
 
 const Crawl = module.exports = {
     crawl: async (browser, page, writeStream, depth = 0) => {
